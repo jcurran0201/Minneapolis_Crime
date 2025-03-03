@@ -145,7 +145,7 @@ prev_jul_dec <- previous_years %>%
   filter(month %in% 7:12) %>%
   group_by(year) %>%
   summarise(total_crimes = n(), .groups = "drop") %>%
-  mutate(year = as.character(year),  # Ensure year is character for indexing
+  mutate(year = as.character(year),  
          weight = weights[year],
          weighted_crimes = total_crimes * weight)
 
