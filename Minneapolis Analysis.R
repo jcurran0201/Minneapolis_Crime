@@ -134,13 +134,13 @@ ggplot(data = crime_df, aes(x = Year, y = Victim_Probability)) +
 
 #Question 5 Project how much crime will occur from July 2016 until the end of the year in Minneapolis?
 
-# Step 1: Assign weights for each year 
+# Assign weights for each year 
 weights <- c(`2013` = 0.2, `2014` = 0.3, `2015` = 0.5)
 
 # Filter data for previous years (2013-2015)
 previous_years <- Cleaned_data %>% filter(year %in% c(2013, 2014, 2015))
 
-# Step 2: Apply weights to July–Dec crimes for 2013-2015
+# Apply weights to July–Dec crimes for 2013-2015
 prev_jul_dec <- previous_years %>%
   filter(month %in% 7:12) %>%
   group_by(year) %>%
@@ -149,38 +149,38 @@ prev_jul_dec <- previous_years %>%
          weight = weights[year],
          weighted_crimes = total_crimes * weight)
 
-# Step 3: Calculate weighted average for July–Dec (2013–2015)  
+# Calculate weighted average for Jul–Dec (2013–2015)  
 #weighted avg formula is (summation of (score*weight))/mean(weights)
 weighted_avg_jul_dec <- sum(prev_jul_dec$weighted_crimes) / sum(prev_jul_dec$weight)
 
-# Step 4: Calculate first half (Jan–June) 2016 crimes 
+# Calculate Jan–Jun 2016 crimes 
 twenty_sixteen <- Cleaned_data %>% filter(year == 2016) 
 first_half_2016 <- twenty_sixteen %>% filter(month %in% 1:6) 
 print(nrow(first_half_2016)) 
 
-# Step 5: Calculate growth rate of crime in first half of 2016 
+# Calculate growth rate of crime in first half of 2016 
 
 prev_jan_jun <- previous_years %>%
   filter(month %in% 1:6) %>%
   group_by(year) %>%
   summarise(total_crimes = n(), .groups = "drop")
-#get the average of crimes from 2013-2015 to use as init value in growth rate
+# get the average of crimes from 2013-2015 to use as initial value in growth rate
 avg_prev_jan_jun <- mean(prev_jan_jun$total_crimes, na.rm = TRUE)  
 
 #growth rate = ((Final value - init value)/(init value))*100
 growth_rate <- (first_half_2016_count - avg_prev_jan_jun) / avg_prev_jan_jun
 
-# Step 6: Apply weighted average to July–Dec projection for 2016
+# Apply weighted average to Jul–Dec projection for 2016
 adjusted_jul_dec_2016 <- weighted_avg_jul_dec * (1 + growth_rate)
 
-# Step 7: Calculate total projected crimes for 2016
+# Calculate total projected crimes for 2016
 total_projected_2016 <- first_half_2016_count + adjusted_jul_dec_2016
 
-# Step 8: Estimate confidence range for projection (±5% variation)
+#  Estimate confidence range for projection (±5% variation)
 lower_bound <- adjusted_jul_dec_2016 * 0.95
 upper_bound <- adjusted_jul_dec_2016 * 1.05
 
-# Step 9: Print results
+#  Print results
 cat("Weighted July–Dec (2013-2015):", round(weighted_avg_jul_dec), "\n")
 cat("Growth Rate for 2016:", round(growth_rate * 100, 2), "%\n")
 cat("Projected July–Dec 2016 Crimes:", round(adjusted_jul_dec_2016), "\n") 
@@ -191,7 +191,7 @@ cat("Total Projected Crimes for 2016:", round(total_projected_2016), "\n")
 twenty_sixteen_crime_prob <- (18889 / 415315) * 100 
 cat("Probability of being a crime victim in Minneapolis in 2016:", round(twenty_sixteen_crime_prob, 3), "%\n")
 
-# Step 10: Visualization with weighted average line
+# Visualization with weighted average line
 ggplot(prev_jul_dec, aes(x = factor(year), y = total_crimes)) +
   geom_bar(stat = "identity", fill = "steelblue") +
   geom_hline(yintercept = weighted_avg_jul_dec, linetype = "dashed", color = "green") +
